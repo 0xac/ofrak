@@ -100,7 +100,8 @@ setuptools.setup(
         "xattr>=0.10.1;platform_system!='Windows'",
     ],
     extras_require={
-        "entropy-mlx": ["mlx>=0.32;platform_system=='Darwin' and platform_machine=='arm64'"]
+        "entropy-mlx": ["mlx>=0.32;platform_system=='Darwin' and platform_machine=='arm64'"],
+        "entropy-torch": ["torch>=2"],
     },
     author="Red Balloon Security",
     author_email="ofrak@redballoonsecurity.com",
