@@ -204,6 +204,24 @@ async def test_mlx_backend_selection(ofrak_context: OFRAKContext, monkeypatch):
     assert received == [data]
 
 
+async def test_mlx_failure_cleans_up_tag(ofrak_context: OFRAKContext, monkeypatch):
+    from ofrak.core.entropy import entropy_mlx
+
+    def fake_fail(data):
+        raise RuntimeError("simulated MLX failure")
+
+    monkeypatch.setattr(entropy_mlx, "sample_entropy_mlx", fake_fail)
+    root = await ofrak_context.create_root_resource(
+        "entropy", bytes(index % 256 for index in range(260))
+    )
+    analyzer: MlxDataSummaryAnalyzer = ofrak_context.component_locator.get_by_id(
+        MlxDataSummaryAnalyzer.get_id()
+    )
+    with pytest.raises(RuntimeError, match="simulated MLX failure"):
+        await analyzer.get_data_summary(root)
+    assert not root.has_tag(MlxEntropyResource)
+
+
 async def test_mlx_analyzer_is_not_automatic(ofrak_context: OFRAKContext):
     root = await ofrak_context.create_root_resource("entropy", bytes(range(255)))
     await root.auto_run(all_analyzers=True)

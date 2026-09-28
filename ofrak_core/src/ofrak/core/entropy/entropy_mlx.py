@@ -159,9 +159,17 @@ class MlxDataSummaryAnalyzer(Analyzer[None, MlxDataSummaryCache]):
         return MlxDataSummaryCache(cache_key)
 
     async def get_data_summary(self, resource: Resource) -> DataSummary:
+        added_tag = False
         if not resource.has_tag(MlxEntropyResource):
             resource.add_tag(MlxEntropyResource)
             await resource.save()
-        await resource.run(MlxDataSummaryAnalyzer)
+            added_tag = True
+        try:
+            await resource.run(MlxDataSummaryAnalyzer)
+        except Exception:
+            if added_tag:
+                resource.remove_tag(MlxEntropyResource)
+                await resource.save()
+            raise
         cache_info = resource.get_attributes(MlxDataSummaryCache)
         return self._cache[cache_info.cache_key]
