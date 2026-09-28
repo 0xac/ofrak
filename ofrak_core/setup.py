@@ -99,6 +99,9 @@ setuptools.setup(
         "ubi-reader>=0.8.12",
         "xattr>=0.10.1;platform_system!='Windows'",
     ],
+    extras_require={
+        "entropy-torch": ["torch>=2"],
+    },
     author="Red Balloon Security",
     author_email="ofrak@redballoonsecurity.com",
     long_description=long_description,
